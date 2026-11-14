@@ -1,0 +1,63 @@
+/* PlanBridge Page Guide — intentionally matches the existing plum/cream/terracotta visual system. */
+.pb-guide-toggle{
+  position:fixed;right:22px;bottom:calc(20px + env(safe-area-inset-bottom));z-index:110;
+  min-height:49px;padding:11px 19px;border:1px solid #e5c3aa;border-radius:999px;
+  background:#302437;color:#fff7eb;box-shadow:0 8px 28px #30243740;
+  font:700 15px/1.3 "Trebuchet MS","Segoe UI",Arial,sans-serif;cursor:pointer;
+}
+.pb-guide-toggle:hover{background:#44334b}
+.pb-guide-toggle:focus-visible,.pb-guide-panel button:focus-visible,.pb-guide-panel input:focus-visible{outline:3px solid #e8ab50;outline-offset:2px}
+.pb-guide-panel{
+  position:fixed;right:22px;bottom:calc(80px + env(safe-area-inset-bottom));z-index:111;
+  width:min(385px,calc(100vw - 28px));height:min(610px,calc(100dvh - 112px));
+  display:flex;flex-direction:column;min-height:300px;border-radius:17px;overflow:hidden;
+  border:1px solid #e0cab9;background:#fffdf9;color:#302437;
+  box-shadow:0 18px 55px #251b3050;font:15px/1.52 "Trebuchet MS","Segoe UI",Arial,sans-serif;
+}
+.pb-guide-panel[hidden]{display:none!important}
+.pb-guide-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+  background:#302437;color:#fff8ed;padding:16px 16px 13px}
+.pb-guide-header strong{display:block;font-size:17px;line-height:1.25}
+.pb-guide-header span{display:block;font-size:12px;color:#dfccd3;margin-top:3px}
+.pb-guide-header button{border:1px solid #85788a;background:#4b3b53;color:#fff8ed;
+  border-radius:8px;min-width:34px;min-height:34px;font:600 23px/1 sans-serif;cursor:pointer}
+.pb-guide-context{padding:10px 14px;background:#f6ecdf;color:#5e4350;
+  border-bottom:1px solid #e8d8c8;font-size:12px;font-weight:750;line-height:1.45}
+.pb-guide-messages{flex:1;min-height:90px;overflow-y:auto;overscroll-behavior:contain;
+  display:flex;flex-direction:column;gap:10px;padding:15px 14px;
+  background:linear-gradient(180deg,#fffdf9,#fcf8f2)}
+.pb-guide-message{padding:11px 12px;border-radius:12px;margin:0;max-width:96%;
+  font-size:14px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+.pb-guide-answer{align-self:flex-start;background:#f0e7df;color:#392f3b;border-bottom-left-radius:4px}
+.pb-guide-question{align-self:flex-end;background:#9d402d;color:#fff;border-bottom-right-radius:4px}
+.pb-guide-prompts{display:flex;align-content:start;flex-wrap:wrap;gap:7px;padding:10px 13px;
+  max-height:118px;overflow-y:auto;border-top:1px solid #e6dbd0}
+.pb-guide-prompts button{background:#fffaf4;border:1px solid #d6bda8;border-radius:999px;
+  color:#663947;padding:6px 9px;font-size:12px;font-weight:700;line-height:1.35;
+  cursor:pointer;text-align:left}
+.pb-guide-prompts button:hover{background:#f3e5d8}
+.pb-guide-form{display:flex;gap:8px;padding:10px 12px 6px;align-items:center}
+.pb-guide-form input{flex:1;min-width:0;border:1px solid #cdb9a9;border-radius:10px;background:#fff;
+  color:#302437;height:44px;padding:9px 10px;font:15px/1.3 inherit}
+.pb-guide-form button{height:44px;min-width:53px;padding:0 13px;border:0;border-radius:10px;
+  background:#9d402d;color:#fff;font-size:14px;font-weight:800;cursor:pointer}
+.pb-guide-form button:hover{background:#7c2b1c}
+.pb-guide-note{padding:0 14px 11px;margin:0;color:#7b7078;font-size:10px;line-height:1.3}
+.pb-guide-sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
+  clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:650px){
+  .pb-guide-toggle{right:12px;bottom:calc(12px + env(safe-area-inset-bottom));
+    font-size:14px;padding:11px 15px;min-height:48px}
+  .pb-guide-panel{left:8px;right:8px;bottom:calc(71px + env(safe-area-inset-bottom));
+    width:auto;height:min(640px,calc(100dvh - 96px));border-radius:14px}
+  .pb-guide-prompts{max-height:105px}
+  .pb-guide-message{font-size:14px}
+}
+@media(max-height:510px){
+  .pb-guide-panel{height:calc(100dvh - 85px);min-height:210px}
+  .pb-guide-header{padding:9px 13px}
+  .pb-guide-prompts{max-height:72px}
+}
+@media(prefers-reduced-motion:reduce){
+  .pb-guide-panel,.pb-guide-toggle{scroll-behavior:auto}
+}
