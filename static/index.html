@@ -1,9 +1,10 @@
 <!doctype html>
 <html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f7f9fc">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#302437">
 <meta name="description" content="PlanBridge: interactive retirement plan operations simulation with payroll validation, participant elections, exception handling, fictional ledger, and automated QA.">
 <title>PlanBridge | Retirement Operations Studio</title>
-<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/styles.css?v=2.1">
+<link rel="stylesheet" href="/theme.css?v=2.1">
 </head><body>
 <div class="app-shell">
   <aside class="sidebar" id="sidebar">
@@ -16,9 +17,10 @@
       <button type="button" class="subtle-action" id="reset-btn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg> Reset my workspace</button>
     </div>
   </aside>
+  <button type="button" id="nav-scrim" class="nav-scrim" hidden tabindex="-1" aria-label="Close navigation"></button>
   <div class="main-wrap">
     <header class="topbar">
-      <button type="button" class="mobile-menu" id="menu-toggle" aria-label="Open navigation">☰</button>
+      <button type="button" class="mobile-menu" id="menu-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">☰</button>
       <div class="top-meta"><span class="top-crumb">PlanBridge</span><span class="crumb-slash">/</span><span id="crumb-current">Overview</span></div>
       <div class="top-controls"><span class="environment"><span class="pulse"></span> Interactive sandbox</span><div class="persona"><label for="actor-select">Viewing as</label><select id="actor-select" aria-label="Choose a demonstration persona"></select></div></div>
     </header>
@@ -27,5 +29,6 @@
   </div>
 </div>
 <div role="status" aria-live="polite" id="toast" class="toast" hidden></div>
-<script src="/app.js" defer></script>
+<script src="/help.js?v=2.1" defer></script>
+<script src="/app.js?v=2.1" defer></script>
 </body></html>

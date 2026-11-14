@@ -35,7 +35,7 @@ class Handler(BaseHTTPRequestHandler):
     def send_bytes(self,status,content,kind='application/json; charset=utf-8',cookie=None):
         self.send_response(status)
         self.send_header('Content-Type',kind)
-        self.send_header('Cache-Control','no-store' if kind.startswith('application/json') else 'public, max-age=3600')
+        self.send_header('Cache-Control','no-store' if kind.startswith(('application/json', 'text/html')) else 'public, max-age=300')
         self.send_header('X-Content-Type-Options','nosniff')
         self.send_header('Referrer-Policy','no-referrer')
         self.send_header('X-Frame-Options','DENY')
@@ -58,7 +58,7 @@ class Handler(BaseHTTPRequestHandler):
                 data=s['engine'].snapshot()
             return self.reply(200,{'data':data,'csrf':s['csrf']},sid)
         if path=='/' or path=='/index.html':path='/index.html'
-        if path in ('/index.html','/app.js','/styles.css'):
+        if path in ('/index.html','/app.js','/styles.css','/theme.css','/help.js'):
             resource=STATIC/path.lstrip('/')
             kind={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'application/javascript; charset=utf-8'}[resource.suffix]
             return self.send_bytes(200,resource.read_bytes(),kind)

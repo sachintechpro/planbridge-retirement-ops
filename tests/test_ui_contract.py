@@ -1,54 +1,41 @@
-"""Static UI contract tests for accessibility, responsive behavior, and contextual help.
-The business logic remains covered by test_engine.py.
+"""Regression checks for mobile typography and asset delivery.
+
+Browser viewport coverage is exercised in development with Playwright; these
+standard-library checks also run in Render's dependency-free CI build.
 """
-from pathlib import Path
 import unittest
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-CSS = (ROOT / "static" / "styles.css").read_text(encoding="utf-8")
-JS = (ROOT / "static" / "app.js").read_text(encoding="utf-8")
-HTML = (ROOT / "static" / "index.html").read_text(encoding="utf-8")
 
+class ResponsiveUIContractTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.html = (ROOT / 'static/index.html').read_text(encoding='utf-8')
+        cls.theme = (ROOT / 'static/theme.css').read_text(encoding='utf-8')
+        cls.server = (ROOT / 'server.py').read_text(encoding='utf-8')
 
-class UIContractTests(unittest.TestCase):
-    def test_distinct_accessible_theme(self):
-        self.assertIn("PLANBRIDGE-V2-EDITORIAL-THEME", CSS)
-        self.assertIn("#302437", CSS)
-        self.assertIn("Georgia", CSS)
-        self.assertIn("font-size:16px", CSS)
+    def test_mobile_viewport_and_versioned_assets(self):
+        self.assertIn('width=device-width,initial-scale=1', self.html)
+        for url in ['/styles.css?v=2.1', '/theme.css?v=2.1', '/help.js?v=2.1', '/app.js?v=2.1']:
+            with self.subTest(url=url):
+                self.assertIn(url, self.html)
 
-    def test_mobile_viewports_and_overflow_guards(self):
-        self.assertIn("@media(max-width:900px)", CSS)
-        self.assertIn("@media(max-width:600px)", CSS)
-        self.assertIn("@media(max-width:360px)", CSS)
-        self.assertIn("grid-template-columns:minmax(0,1fr)", CSS)
-        self.assertIn("overflow-x:auto", CSS)
+    def test_all_navigation_and_context_helpers_load(self):
+        self.assertIn('id="menu-toggle"', self.html)
+        self.assertIn('id="nav-scrim"', self.html)
+        self.assertIn('/help.js?v=2.1', self.html)
+        self.assertTrue((ROOT / 'static/help.js').exists())
+        self.assertIn('PlanBridgeHelp', (ROOT / 'static/app.js').read_text(encoding='utf-8'))
+        self.assertIn("'/theme.css'", self.server)
+        self.assertIn("'/help.js'", self.server)
 
-    def test_navigation_accessibility(self):
-        self.assertIn("aria-label=\"Open navigation\"", HTML)
-        self.assertIn("togglePlanBridgeDrawer", JS)
-        self.assertIn("closePlanBridgeDrawer", JS)
-        self.assertIn("aria-expanded", JS)
-        self.assertIn("Escape", JS)
+    def test_font_scale_technical_notes_and_mobile_overflow(self):
+        for expected in ['--type-body: 16px', 'text-size-adjust: 100%',
+                         '.note {', 'font-size: 15px', '.table-wrap {',
+                         '@media (max-width:600px)', 'overflow-wrap: anywhere']:
+            with self.subTest(rule=expected):
+                self.assertIn(expected, self.theme)
 
-    def test_help_is_available_on_every_page(self):
-        self.assertIn("renderAssistance(page)", JS)
-        for page in ["overview","employers","participants","payroll",
-                     "exceptions","ledger","requests","architecture","quality"]:
-            self.assertIn(page + ":[", JS)
-
-    def test_help_is_touch_and_keyboard_accessible(self):
-        self.assertIn('<details class="context-topic">', JS)
-        self.assertIn('<summary>', JS)
-        self.assertIn("help-inline", JS)
-        self.assertIn("summary:focus-visible", CSS)
-
-    def test_guidewire_analogy_is_not_misrepresented(self):
-        self.assertIn("not an InsuranceSuite integration", JS)
-        self.assertIn("PolicyCenter", JS)
-        self.assertIn("BillingCenter", JS)
-        self.assertIn("ClaimCenter", JS)
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

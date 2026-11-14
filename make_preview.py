@@ -7,6 +7,8 @@ import json
 ROOT=Path(__file__).parent
 html=(ROOT/'static/index.html').read_text()
 css=(ROOT/'static/styles.css').read_text()
+theme=(ROOT/'static/theme.css').read_text()
+help_js=(ROOT/'static/help.js').read_text()
 js=(ROOT/'static/app.js').read_text()
 js=js.replace('Run all 18 checks','Show baseline QA report')
 js=js.replace('Test execution complete:', 'Baseline report loaded:')
@@ -91,8 +93,10 @@ mock=r'''
 })();
 '''
 mock=mock.replace('__STATE__',json.dumps(base,separators=(',',':'))).replace('__QA__',json.dumps(qa,separators=(',',':')))
-html=html.replace('<link rel="stylesheet" href="/styles.css">',f'<style>{css}</style>')
-html=html.replace('<script src="/app.js" defer></script>',f'<script>{mock}</script><script>{js}</script>')
+html=html.replace('<link rel="stylesheet" href="/styles.css?v=2.1">',f'<style>{css}</style>')
+html=html.replace('<link rel="stylesheet" href="/theme.css?v=2.1">',f'<style>{theme}</style>')
+html=html.replace('<script src="/help.js?v=2.1" defer></script>',f'<script>{help_js}</script>')
+html=html.replace('<script src="/app.js?v=2.1" defer></script>',f'<script>{mock}</script><script>{js}</script>')
 html=html.replace('<header class="topbar">','<header class="topbar">')
 html=html.replace('<footer class="footer">', '<footer class="footer">Offline browser-only preview. Real API rules and executable QA tests are in the full Python project. · ')
 path=ROOT/'preview.html'

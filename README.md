@@ -4,31 +4,14 @@
 
 > **Purpose:** Demonstrate how an FDE can discover operational friction, build a role-aware application, integrate payroll-style feeds, encode business workflow gates, diagnose exceptions, create auditable state changes, and verify the solution with runnable tests. The software uses synthetic data. It never moves money, opens real financial accounts, or provides investment, fiduciary, or legal advice.
 
-**Live interactive demo:** [Launch PlanBridge on Render](https://planbridge-retirement-ops.onrender.com/)  
-**Source repository:** [sachintechpro/planbridge-retirement-ops](https://github.com/sachintechpro/planbridge-retirement-ops)  
-**Demo access:** No account, credentials, payments, or external API keys required.
+![PlanBridge home screen](docs/overview-desktop.png)
 
-**[Launch the live interactive PlanBridge application](https://planbridge-retirement-ops.onrender.com/)** · [Browse source code](https://github.com/sachintechpro/planbridge-retirement-ops)
 
-*The live application reflects the latest responsive editorial redesign. Earlier reference screenshots in `docs/` are retained as historical design artifacts.*
+## Readable mobile interface and contextual guidance
 
-## Design and contextual help (v2)
+The current interface uses a **consistent responsive typography scale** across all nine pages, including a compact 15px technical-note style. On small screens the navigation becomes a drawer, long tables scroll *inside* their cards, and field tooltips open inside the viewport. The design is checked at **320, 375, 393, 768, and 1440 CSS pixels**. The theme uses warm cream, plum, and terracotta rather than a standard blue/white template.
 
-PlanBridge uses a distinctive **plum / warm-cream / terracotta** visual system with larger body text, high-contrast controls, responsive cards, horizontal scrolling confined to wide data tables, and a mobile navigation drawer. The interface supports desktop, tablet and phone exploration without a separate mobile application.
-
-Every page has an interactive **Business and technical guide** with three expandable topics:
-
-- **Try the workflow:** business intent and a reproducible action to perform with synthetic records.
-- **Technical detail:** Python API endpoint, role/state gate, reconciliation or audit evidence supporting the screen.
-- **Guidewire concept:** an explicitly labeled architecture/process **analogy**, not a claimed connection.
-
-Tables include touch- and keyboard-accessible **?** tooltips for state, batch, participant, employer, amount and related terms. Escape dismisses help and closes mobile navigation.
-
-**InsuranceSuite boundary:** This is a fictional retirement operations platform. It does **not** use the Guidewire PolicyCenter, BillingCenter or ClaimCenter APIs. References illustrate patterns such as authorization, transaction lifecycles, integration contracts, reconciliations and exception queues. See [Guidewire Cloud API documentation](https://docs.guidewire.com/cloud/bc/202511/cloudapibf/cloudAPI/topics/101-Fund/01-overview-of-Cloud-API/c_introduction-to-Cloud-API.html) for the actual insurance API architecture.
-
-### Responsive verification
-
-The interface was assessed with automated browser viewport/page checks at widths **320, 390, 768, 1024 and 1440 pixels** covering all nine pages. Server business logic and 21 Python engine tests remain unchanged by this user-interface enhancement; six new UI contract tests verify responsiveness, help affordances, navigation and Guidewire boundaries. The interactive 18-check test bench remains available on the Test bench page.
+Each page includes business, technical, and Guidewire-pattern comparison help. The Guidewire material is **architectural comparison**, not an InsuranceSuite integration. The app remains a fictional retirement operations system.
 
 ## Start here: 7-minute guided demo
 
@@ -68,7 +51,7 @@ Run tests:
 python -m unittest discover -s tests -v
 ```
 
-The **Test bench** tab also runs 18 isolated business/technical checks and exposes the evidence for each. The repository includes 21 Python engine/workflow tests and six additional responsive UI/context-help contract tests (27 total).
+The **Test bench** tab also runs 18 isolated business/technical checks and exposes the evidence for each. The repository includes 24 standalone Python unit/workflow and responsive UI contract tests.
 
 ## Business workflow
 
@@ -127,7 +110,7 @@ All names and amounts are invented. The sample `example.test` addresses are non-
 - **Backend:** Python standard-library `ThreadingHTTPServer`; no paid APIs, frameworks or environment variables required.
 - **State:** each browser has an independent ephemeral, in-memory session with an HttpOnly, SameSite cookie. A reset restores seeded data. A server restart clears session state. Not a persistence architecture for production.
 - **Controls:** CSRF token on mutations, JSON body size cap, server-side role/tenant checks, action-specific workflow guards, amount reconciliation, no double-posting, audit events, and basic security headers.
-- **QA:** 18 interactive deterministic checks in `quality.py` and 21 engine/workflow tests in `tests/test_engine.py`, plus six UI contract tests in `tests/test_ui_contract.py`; GitHub Actions CI workflow.
+- **QA:** 18 interactive deterministic checks in `quality.py` and 24 automated Python tests in `tests/`; GitHub Actions CI workflow.
 - **Hosting:** free Render web service supported by `render.yaml`; no billing/AI/search subscriptions needed.
 
 ### API contract
@@ -168,17 +151,17 @@ The IRS explains elective deferrals, employer matches, and participant limits; t
 - **Real functional state transitions:** validation and exception repairs change the Python engine's in-memory state in the server-backed version. Refresh the browser to see the resulting session state.
 - **Negative-path testing:** duplicate payroll runs, tenant boundary violations, invalid contributions, missing participants, unapplied approvals and repeat posting are rejected by server logic, not just hidden UI buttons.
 - **Business/engineering traceability:** every guided scenario maps a business operation to the related actor, API action, expected status, and evidence.
-- **Reviewability:** `tests/test_engine.py` covers 21 workflow and permission scenarios; `tests/test_ui_contract.py` adds six interface/accessibility contracts; `quality.py` powers 18 named on-demand checks. `reports/qa-report.json` is a baseline artifact, not a substitute for running the tests.
+- **Reviewability:** `tests/test_engine.py` covers 21 workflow and permission scenarios plus `tests/test_ui_contract.py` covers 3 responsive UI contracts; `quality.py` powers 18 named on-demand checks. `reports/qa-report.json` is a baseline artifact, not a substitute for running the tests.
 - **Data realism with safety:** all five employers, 60 participants and seven payroll batches are synthetic and deterministic. There are no external financial integrations.
 
 **FDE boundary:** This is a realistic *portfolio implementation*, not a claim of having deployed a retirement platform to a real customer. The README separately identifies proposed production integrations and what is implemented today.
 
-## Live demo and deployment
+## Render deployment
 
-- **[Open the public PlanBridge demo](https://planbridge-retirement-ops.onrender.com/)** — switch between personas, complete simulated employer and payroll workflows, inspect audit evidence, and run the interactive test bench.
-- **[View the GitHub source](https://github.com/sachintechpro/planbridge-retirement-ops)** — inspect the Python engine, frontend, CSV fixtures, QA tests and implementation documentation.
-- **[Check service health](https://planbridge-retirement-ops.onrender.com/health)** — expected JSON includes `"status":"healthy"`.
-- **Automatic deployment:** Render deploys commits to `main`. Build command: `python -m compileall -q . && python -m unittest discover -s tests -q`; start command: `python server.py`.
-- **Cold starts:** Free-tier instances may take additional time to respond after inactivity. Session data is intentionally ephemeral and resets when the server restarts.
+1. Create a **new public GitHub repository** named `planbridge-retirement-ops`.
+2. Commit these files to its `main` branch (leave all files in the project root).
+3. On Render, choose **New → Blueprint** and connect the repository, or **New → Web Service** with runtime Python, build command `python -m unittest discover -s tests -q`, start command `python server.py`, and free instance plan.
+4. Once deployed, verify `/health`, all personas, payroll happy/exception paths, audit evidence, test bench, and a mobile viewport.
+5. Add the verified Render URL and repository URL at the top of this README and to your portfolio once both exist.
 
 No API keys. No secrets. No real user/customer data. No external vendors. 
