@@ -23,7 +23,7 @@ async function changeActor(actor){try{const out=await api('/api/actor',{actor});
 const capRows=(rows)=>rows.length?rows.join(''):`<tr><td colspan="8"><div class="empty">No records in this view.</div></td></tr>`;
 const can=(...roles)=>roles.includes(S.actor.role);
 function renderNav(){const navKeys=['overview','employers','participants','payroll','exceptions','ledger','requests','architecture','quality'];const allowed=navKeys.filter(k=>S.actor.role!=='participant'||['overview','participants','requests','architecture','quality'].includes(k));$('#nav').innerHTML=allowed.map(k=>`<button type="button" class="nav-item ${page===k?'active':''}" data-nav="${k}"><span style="font-size:19px;width:18px;text-align:center">${icons[k]}</span>${titles[k]}</button>`).join('');$('#crumb-current').textContent=titles[page];const selector=$('#actor-select');selector.innerHTML=S.actors.map(a=>`<option value="${esc(a.id)}" ${a.id===S.actor.id?'selected':''}>${esc(a.label)}</option>`).join('')}
-function render(){if(!S)return;renderNav();let html='';try{html=({overview:renderOverview,employers:renderEmployers,participants:renderParticipants,payroll:renderPayroll,exceptions:renderExceptions,ledger:renderLedger,requests:renderRequests,architecture:renderArchitecture,quality:renderQuality}[page]||renderOverview)()}catch(e){html=`<div class="notice">This view could not render: ${esc(e.message)}</div>`;console.error(e)}$('#app').innerHTML=html;}
+function render(){if(!S)return;renderNav();let html='';try{html=({overview:renderOverview,employers:renderEmployers,participants:renderParticipants,payroll:renderPayroll,exceptions:renderExceptions,ledger:renderLedger,requests:renderRequests,architecture:renderArchitecture,quality:renderQuality}[page]||renderOverview)()}catch(e){html=`<div class="notice">This view could not render: ${esc(e.message)}</div>`;console.error(e)}$('#app').innerHTML=html;renderAssistance(page);}
 function renderOverview(){const actor=S.actor,stats=S.stats;const view=actor.role==='participant';let current=S.batches.filter(b=>b.state==='received'||b.state==='exception');return `
 <div class="hero"><div><div class="eyebrow">FORWARD-DEPLOYED ENGINEERING CASE STUDY</div><h1>Make retirement operations<br>work as one connected system.</h1><p>A functional, fictional 401(k)/403(b) platform showing how plan sponsors, employees, payroll processors, and operations teams coordinate from enrollment to contribution posting.</p><div class="hero-facts"><span><b>5</b> Synthetic employers</span><span><b>60</b> Participant profiles</span><span><b>7</b> Seeded pay runs</span><span><b>18</b> Automated checks</span></div></div>${button('Explore architecture →','go',{page:'architecture'},'primary')}</div>
 <div class="persona-banner">Viewing as <b>${esc(actor.label)}</b> — ${esc(actor.note)}. Switch personas above to test each stakeholder's workflow and permitted actions.</div>
@@ -56,7 +56,7 @@ HTTP 200
 }</pre><p class="lead">Permissions and state transitions are validated in the Python engine, not merely disabled in the UI.</p>`)}${panel('Integration and production boundaries',`<ul class="tree"><li><b>Demo adapters</b>Payroll provider names and file payloads are simulated; there are no external vendor credentials</li><li><b>Session isolation</b>Independent synthetic workspace per visitor in server memory, resettable and ephemeral</li><li><b>Not production security</b>The persona switcher is deliberately open, not a real IAM provider or login</li><li><b>Not regulatory software</b>2026 contribution limit shown as simplified screening; no age, catch-up, plan-specific or jurisdiction determinations</li><li><b>Deployment path</b>Python 3 standard library; no databases, API keys or paid services required</li></ul>`)}${panel('Reference controls',`<p class="lead">The simulator captures concepts used in U.S. retirement plans—employee elective deferrals, employer matching, deposit timing, and plan fiduciary oversight. It does not implement legal compliance rules.</p><p class="lead"><a href="https://www.irs.gov/retirement-plans/401k-plan-overview" target="_blank" rel="noopener noreferrer">IRS: 401(k) overview ↗</a></p><p class="lead"><a href="https://www.dol.gov/agencies/ebsa/about-ebsa/our-activities/resource-center/faqs/retirement-plans-and-erisa" target="_blank" rel="noopener noreferrer">DOL: ERISA and contribution timing ↗</a></p>`)}</div></div>${tech('README.md, engine.py, seed.py, quality.py','Server-side ownership, explicit state transitions, isolated test fixtures','Audit events, response evidence, reproducible test results')}`}
 function renderQuality(){let rows=report?.results||[],pass=report?.passed||0;let categories=['Unit','Integration','E2E','RBAC','Security','UAT'];return `${head('Test bench',subtitles.quality,button('Run all 18 checks','run_tests',{},'primary'))}<div class="stats">${stat('Runnable checks',18,'No changes to visitor state')}${stat('Executed',report?.total??'—','Last in-session run')}${stat('Passed',report?pass:'—','Evidence per case')}${stat('Failed',report?.failed??'—','Actionable failure output')}</div>${panel('Live execution results',rows.length?`<div class="quality-summary"><div><b>${report.total}</b><span>Total executed</span></div><div><b style="color:#178254">${pass}</b><span>Passed</span></div><div><b style="color:#a74d40">${report.failed}</b><span>Failed</span></div></div><p class="instruction">${esc(report.execution)}</p><div class="test-list">${categories.map(category=>`<div class="section-heading">${category} checks</div>${rows.filter(r=>r.category===category).map(r=>`<div class="test-card"><div><b>${esc(r.name)}</b><p>${esc(r.evidence)}</p></div>${badge(r.status==='PASS'?'validated':'exception')}</div>`).join('')}`).join('')}</div>`:`<div class="empty"><h3>Run the isolated QA suite</h3><p>Exercises contribution math, data integrity, invalid payroll files, exception remediation, replay protection, participant authorization, lifecycle gates, and distribution review. Click “Run all 18 checks.”</p></div>`,'Deterministic engine checks, not read-only placeholders')}<div class="columns equal" style="margin-top:18px">${panel('Defect and exception fixtures',`<div class="table-wrap"><table class="data-table"><thead><tr><th>Case</th><th>Expected result</th><th>Severity</th></tr></thead><tbody><tr><td>PAY-6002<br><span class="subtext">Unmatched participant</span></td><td>BLOCK + case</td><td>High</td></tr><tr><td>PAY-6003<br><span class="subtext">$125 short remittance</span></td><td>BLOCK + reconcile</td><td>High</td></tr><tr><td>PAY-6004<br><span class="subtext">Duplicate external ID</span></td><td>BLOCK after first run validated</td><td>Medium</td></tr><tr><td>PAY-6005<br><span class="subtext">Timeliness review</span></td><td>HUMAN REVIEW</td><td>Medium</td></tr></tbody></table></div>`)}${panel('Validation strategy',`<ul class="tree"><li><b>Unit</b>Contribution/match arithmetic, percentage precision, edge cases</li><li><b>Integration</b>Employer–participant mapping, reconciliation, review flags</li><li><b>System / E2E</b>Multi-step payroll-to-ledger, remediation, duplicate post prevention</li><li><b>RBAC / security</b>Cross-employer access, role constraints, invalid inputs</li><li><b>Business UAT</b>Sponsor activation, distribution review gating, self-service</li><li><b>Deployment smoke</b>GET /health; status returns healthy without any external API</li></ul>`)}</div>${tech('quality.py → fresh Engine instances per check','No subprocess execution; no mutation of active browser state','POST /api/tests returns JSON PASS/FAIL cases and inspectable evidence')}`}
 document.addEventListener('click',async e=>{
- const nav=e.target.closest('[data-nav]');if(nav){page=nav.dataset.nav;filter='';render();$('#sidebar').classList.remove('open');window.scrollTo(0,0);return}
+ const nav=e.target.closest('[data-nav]');if(nav){page=nav.dataset.nav;filter='';render();closePlanBridgeDrawer();window.scrollTo(0,0);return}
  const emb=e.target.closest('[data-employer]');if(emb){selectedEmployer=emb.dataset.employer;render();return}
  const per=e.target.closest('[data-person]');if(per){selectedPerson=per.dataset.person;render();return}
  const bat=e.target.closest('[data-batch]');if(bat){selectedBatch=bat.dataset.batch;render();return}
@@ -73,5 +73,74 @@ document.addEventListener('click',async e=>{
 document.addEventListener('input',e=>{if(e.target.id==='people-filter'){filter=e.target.value;const value=e.target.selectionStart;render();const el=$('#people-filter');if(el){el.focus();el.setSelectionRange(value,value)}}});
 $('#actor-select').addEventListener('change',e=>changeActor(e.target.value));
 $('#reset-btn').addEventListener('click',()=>{const el=document.createElement('button');el.dataset.action='reset';el.hidden=true;document.body.appendChild(el);el.click();el.remove()});
-$('#menu-toggle').addEventListener('click',()=>$('#sidebar').classList.toggle('open'));
+$('#menu-toggle').addEventListener('click',togglePlanBridgeDrawer);
 refresh().catch(err=>{$('#app').innerHTML=`<div class="notice">Unable to load the API: ${esc(err.message)}</div>`});
+
+
+/* PLANBRIDGE-V2-CONTEXT-HELP — touchscreen & keyboard accessible, with explicit Guidewire analogy boundaries. */
+const guideCards={
+ overview:["Trace the complete sponsor-to-ledger value stream.",["Business purpose","Switch stakeholder personas to follow the same fictional records through onboarding, elections, payroll, exceptions and posting."],["Backend evidence","Every action calls the Python API and produces a state transition or auditable evidence; tenant and role checks live on the server."],["Guidewire concept","Comparable cross-application orchestration: PolicyCenter policy changes can feed BillingCenter billing requests. PlanBridge models retirement-plan data and has no Guidewire connection."]],
+ employers:["Explore controlled plan activation and cross-team signoff.",["Try the workflow","Select Blue Mesa Kitchens. Move draft → configured as a sponsor; Operations is required for configured → live."],["Technical detail","advance_plan checks current state, the requesting role, employer scope and allowed next state; rejected actions cannot skip stages."],["Guidewire concept","PolicyCenter also uses controlled, authorized policy-job lifecycles. Plan configuration here is not a PolicyCenter insurance transaction."]],
+ participants:["Follow a participant election without rewriting financial history.",["Try the workflow","Switch to Employee · Maya Chen and change a deferral rate. The new election affects future unprocessed payroll only."],["Technical detail","set_deferral validates actor, ownership, rate boundaries and an audit event, while previously posted ledger entries remain unchanged."],["Guidewire concept","Similar change-control principle to PolicyCenter endorsements: permission, effective time and recorded transaction, but no shared insurance entities."]],
+ payroll:["Demonstrate integration validation before fictional funds posting.",["Try the workflow","Select PAY-6001. Validate as Payroll Specialist, post as Operations Analyst and try posting twice to test idempotency."],["Technical detail","validate_batch checks employer/participant mapping, duplicates, remittance totals, elections and timing flags. Only validated batches can post."],["Guidewire concept","BillingCenter handles insurance charges, invoices and payments. This retirement payroll flow uses different objects but shares reconciliation and transaction-integrity concerns."]],
+ exceptions:["Resolve failures through ownership, repair and revalidation.",["Try the workflow","Validate PAY-6003 to surface the $125 short remittance. Repair as Operations, revalidate, then post only after checks pass."],["Technical detail","Exception codes and evidence are recorded; a repair does not automatically authorize posting. State gates and the audit journal enforce the sequence."],["Guidewire concept","Conceptual parallel with ClaimCenter activities: assigned owner, exception/case data, work queue, action evidence and closure. Payroll exceptions are not insurance claims."]],
+ ledger:["Inspect participant-level audit evidence of fictional posting.",["Try the workflow","Post validated PAY-6001 and inspect employee + employer allocation entries and the source batch reference."],["Technical detail","Post rechecks a validated batch and rejects duplicate posting. All entries are synthetic; no payment processor, bank or custodian is connected."],["Guidewire concept","Comparable to financial traceability in BillingCenter: account for source references, reconciliation and posting integrity. Retirement contributions are not policy premiums."]],
+ requests:["Demonstrate employee self-service requiring human review.",["Try the workflow","As Employee · Maya Chen, submit a distribution inquiry and switch to Operations to review it."],["Technical detail","Role- and participant-scoped requests move to reviewed_no_disbursement; the simulator never makes payments."],["Guidewire concept","Broadly similar to ClaimCenter activity/review workflows and authorization gates; it does not adjudicate claims or issue claim payments."]],
+ architecture:["Inspect the FDE architecture and its production boundaries.",["Solution intent","A role-based interface orchestrates sponsor plans, participants, payroll files, exceptions and simulated ledger events."],["System contract","A Python HTTP API owns state, role checks, reconciliation, audit events and test execution. Production would add OIDC, persistence, provider adapters and secure event processing."],["Guidewire reference","InsuranceSuite Cloud API provides REST access to PolicyCenter, BillingCenter and ClaimCenter. PlanBridge is not a Guidewire system, integration or implementation."]],
+ quality:["Prove behavior with executable, observable test cases.",["Try the workflow","Run all 18 isolated checks. Inspect each PASS/FAIL and evidence, then attempt invalid actions in the scenario pages."],["Technical detail","The deterministic test bench uses fresh engine instances; 21 Python unit/workflow tests also cover validation, tenant scoping and state gates."],["Guidewire parallel","The approach maps to Guidewire SIT/UAT: API contracts, negative paths, cross-module dependencies, security, reconciliation and release evidence—not tests executed against InsuranceSuite."]]
+};
+const glossaryHints={
+ status:"Lifecycle state is supplied by the workflow engine, not freely editable in the browser.",
+ state:"Only permitted business transitions can progress a record; invalid states block downstream work.",
+ batch:"A fictional payroll run, identified by an external run reference checked for duplicates.",
+ employer:"A fictional tenant with role-based permissions and isolated records.",
+ participant:"A retirement plan member whose employer and permissions are validated server-side.",
+ remitted:"Received amount must reconcile with calculated employee and employer contributions.",
+ expected:"Calculated amount based on payroll inputs, plan rules and participant elections.",
+ amount:"Fictional transaction amount; this app never moves real money.",
+ exception:"Blocking or review-required event with a reason, owner and evidence.",
+ owner:"Role accountable for resolving this operational task.",
+ deferral:"Employee contribution election applied to future unprocessed payroll.",
+ ledger:"Simulated allocation records created after a validated payroll batch posts.",
+ date:"Illustrative source or processing date from synthetic test data."
+};
+function renderAssistance(view){
+ const model=guideCards[view]||guideCards.overview,app=document.querySelector('#app');
+ if(!app||app.querySelector('.context-guide'))return;
+ const markup='<section class="context-guide" aria-label="Page guidance and technical context"><div class="context-intro"><span class="context-icon" aria-hidden="true">?</span><div><h2>On this page · Business and technical guide</h2><p>'+esc(model[0])+'</p></div></div><div class="context-topics">'+model.slice(1).map(([heading,detail])=>'<details class="context-topic"><summary>'+esc(heading)+'</summary><div class="context-answer">'+esc(detail)+'</div></details>').join('')+'</div><div class="context-note">Guidewire comparisons illustrate architecture and process patterns only. This is a fictional retirement operations application, not an InsuranceSuite integration.</div></section>';
+ const top=app.querySelector('.head,.hero');
+ if(top)top.insertAdjacentHTML('afterend',markup);else app.insertAdjacentHTML('afterbegin',markup);
+ app.querySelectorAll('.data-table th').forEach(th=>{
+   let value=(th.textContent||'').toLowerCase();
+   let entry=Object.entries(glossaryHints).find(([word])=>value.includes(word));
+   if(!entry||th.querySelector('.help-inline'))return;
+   th.insertAdjacentHTML('beforeend','<details class="help-inline"><summary aria-label="Explain '+esc(th.textContent.trim())+'">?</summary><span class="help-inline-answer">'+esc(entry[1])+'</span></details>');
+ });
+}
+function drawerScrim(){
+ let el=document.querySelector('#nav-scrim');
+ if(!el){el=document.createElement('button');el.id='nav-scrim';el.className='nav-scrim';el.type='button';el.setAttribute('aria-label','Close navigation');document.body.appendChild(el);el.addEventListener('click',closePlanBridgeDrawer);}
+ return el;
+}
+function closePlanBridgeDrawer(){
+ const nav=$('#sidebar'),control=$('#menu-toggle');
+ nav?.classList.remove('open');drawerScrim().classList.remove('show');
+ control?.setAttribute('aria-expanded','false');control?.setAttribute('aria-label','Open navigation');
+ document.body.style.overflow='';
+}
+function togglePlanBridgeDrawer(){
+ const nav=$('#sidebar'),control=$('#menu-toggle'),open=!nav.classList.contains('open');
+ nav.classList.toggle('open',open);drawerScrim().classList.toggle('show',open);
+ control?.setAttribute('aria-expanded',String(open));control?.setAttribute('aria-label',open?'Close navigation':'Open navigation');
+ document.body.style.overflow=open?'hidden':'';
+ if(open)nav.querySelector('.nav-item')?.focus();else control?.focus();
+}
+$('#menu-toggle')?.setAttribute('aria-controls','sidebar');
+$('#menu-toggle')?.setAttribute('aria-expanded','false');
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closePlanBridgeDrawer();document.querySelectorAll('.context-topic[open],.help-inline[open]').forEach(d=>d.open=false);}});
+document.addEventListener('click',e=>{
+ for(const className of ['.help-inline','.context-topic']){
+   const summary=e.target.closest(className+' summary');
+   if(summary){const chosen=summary.closest('details');document.querySelectorAll(className+'[open]').forEach(d=>{if(d!==chosen)d.open=false;});}
+ }
+});
