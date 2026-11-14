@@ -145,7 +145,277 @@
     ['quality','Quality evidence includes executable Python checks, workflow-negative cases, role scoping, idempotency tests and deployment smoke checks.']
   ];
   const normalize = text => String(text || '').toLowerCase().replace(/[_–—/-]/g, ' ').replace(/[^a-z0-9% ]/g, ' ').replace(/\s+/g, ' ').trim();
-  const fmt = value => '$' + Number(value || 0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const fmt = value => { const n=Number(value || 0); return (n<0?'-
+  const topicList = TERMS.map(([term,answer]) => ({term,normalized:normalize(term),answer})).sort((a,b)=>b.normalized.length-a.normalized.length);
+  const local = {page:'overview',actor:{label:'Platform Admin'},batch:null,employer:null,person:null,stats:null};
+  let opened=false;
+  let messages=0;
+
+  function pageSpec(){return PAGES[local.page] || PAGES.overview;}
+  function introText(){return LABELS[local.page]+' · '+(local.actor?.label || 'Current persona')+'. '+pageSpec().intro;}
+  function selectedValue(){
+    if (local.page==='payroll' && local.batch) {
+      const b=local.batch;return 'Selected '+b.id+' is '+b.state+'. Expected '+fmt(b.expected_total)+', remitted '+fmt(b.remitted_total)+', variance '+fmt(Number(b.remitted_total || 0)-Number(b.expected_total || 0))+'.';
+    }
+    if (local.page==='employers' && local.employer) return 'Selected '+local.employer.name+' ('+local.employer.id+') is '+local.employer.status+'.';
+    if (local.page==='participants' && local.person) return 'Selected '+local.person.name+' ('+local.person.id+') has a '+local.person.deferral_pct+'% deferral election.';
+    return '';
+  }
+
+  function matchTerm(q){
+    const n=' '+normalize(q)+' ';
+    for (const entry of topicList) {
+      if (n.includes(' '+entry.normalized+' ')) return entry.answer;
+    }
+    return null;
+  }
+  function answer(question){
+    const raw=String(question||'').trim().slice(0,240);
+    if(!raw) return 'Ask about a field, business rule, workflow action, or technology on this page.';
+    const q=normalize(raw),p=pageSpec();
+    if(/\b(hello|hi|hey)\b/.test(q) && q.length<15) return introText();
+    if(/(difference|compare|versus|vs)/.test(q) && /remit/.test(q) && /(calculat|expect)/.test(q)) return TERMS[1][1]+' '+selectedValue();
+    if(/(why|reason).*(block|fail|error|exception)/.test(q) && local.page==='payroll') {
+      if(local.batch?.state==='exception')return 'This batch is in exception state because its validation found a blocking issue. Inspect the Exception workbench, repair as Operations, then validate again. '+selectedValue();
+      return 'Only batches passing mapping, duplicate, reconciliation, and review controls can post. '+selectedValue();
+    }
+    if(/(current|selected|this|my).*(batch|payroll|employer|plan|participant|status|variance)/.test(q) && selectedValue()) return selectedValue()+' Ask about its status or the next allowed step.';
+    if(/(explain|what|meaning|mean|tell).*(field|parameter|number|dashboard|screen|page|metric|column)/.test(q)) return p.fields;
+    if(/\bpay\s*-?\s*600[1-5]\b/.test(q)) {
+      const id=(q.match(/pay\s*-?\s*600[1-5]/)||[''])[0].replace(/\s/g,'').toUpperCase().replace('PAY','PAY-');
+      const cases={'PAY-6001':'Clean payroll: validate with Payroll Specialist, then post with Operations.','PAY-6002':'Unknown participant and remittance issues: validate to create an exception, then remediate and revalidate.','PAY-6003':'Fictional remittance is $125 short: reconcile under Exceptions, then validate again.','PAY-6004':'Duplicate external payroll run ID: the engine must reject replay after its source run was processed.','PAY-6005':'Timeliness review flag: Operations may record acknowledgment, but this does not determine regulatory compliance.'};
+      return (cases[id]||'Payroll fixture.')+' '+(local.batch?.id===id?selectedValue():'');
+    }
+    if(/(how|why).*(role|permission|tenant|security|identity|access)/.test(q)) return p.proof+' '+TERMS.find(x=>x[0]==='rbac')[1];
+    if(/(technology|tech stack|framework|python|javascript|backend|frontend|api|architecture)/.test(q) && /(what|which|how|stack|used|built)/.test(q)) return p.proof+' '+TERMS.find(x=>x[0]==='technology')[1];
+    if(/(what|why).*(this page|this screen|purpose|business)/.test(q)) return p.intro;
+    if(/(production|real world|real integration|simulat)/.test(q)) return TERMS.find(x=>x[0]==='production')[1]+' '+TERMS.find(x=>x[0]==='guidewire')[1];
+    const term=matchTerm(raw);
+    if(term)return term+(selectedValue() && /(variance|calculated total|remitted amount|status|state)/.test(q)?' '+selectedValue():'');
+    if(/(how|walk|steps|try|demo|next|start|use this|what should i do)/.test(q)) return p.how;
+    const help=window.PlanBridgeHelp?.pageHelp?.[local.page];
+    if(help && /(business intent|technical proof|guidewire parallel|how to demo|integration contract|backend boundary)/.test(q)){
+      const card=help.cards.find(([name])=>q.includes(normalize(name)));
+      if(card)return card[1];
+    }
+    const app=document.getElementById('app');
+    const labels=[...app?.querySelectorAll('.definition dt,.stat-label,.data-table th,.field label')||[]].map(el=>el.textContent.trim().replace(/\s*\?$/, '')).filter(Boolean);
+    const unique=[...new Set(labels)].slice(0,14);
+    const termFromVisible=unique.filter(x=>normalize(q).includes(normalize(x))).sort((a,b)=>b.length-a.length)[0];
+    if(termFromVisible)return '“'+termFromVisible+'” is a field on '+LABELS[local.page]+'. '+p.fields+' For a specific rule, ask “How do I use this page?”';
+    return 'I do not have a verified answer to that wording in this demo guide. On '+LABELS[local.page]+', try: '+p.prompts.slice(0,3).join(' · ')+'.';
+  }
+
+  const button=document.createElement('button');
+  button.type='button';button.id='pb-guide-toggle';button.className='pb-guide-toggle';
+  button.setAttribute('aria-controls','pb-guide-panel');button.setAttribute('aria-expanded','false');
+  button.textContent='?  Ask this page';
+  const panel=document.createElement('section');
+  panel.id='pb-guide-panel';panel.className='pb-guide-panel';panel.hidden=true;
+  panel.setAttribute('role','dialog');panel.setAttribute('aria-label','PlanBridge page guide');
+  panel.innerHTML='<header class="pb-guide-header"><div><strong>PlanBridge Page Guide</strong><span>Clear answers from this application</span></div><button type="button" id="pb-guide-close" aria-label="Close page guide">×</button></header>'+
+    '<div class="pb-guide-context" id="pb-guide-context"></div>'+
+    '<div class="pb-guide-messages" id="pb-guide-messages" role="log" aria-label="Guide conversation" aria-live="polite"></div>'+
+    '<div class="pb-guide-prompts" id="pb-guide-prompts" aria-label="Suggested questions"></div>'+
+    '<form id="pb-guide-form" class="pb-guide-form"><label class="pb-guide-sr" for="pb-guide-input">Ask about this page</label><input id="pb-guide-input" type="text" maxlength="240" autocomplete="off" placeholder="Ask about a field or next step…" required><button type="submit">Ask</button></form>'+
+    '<p class="pb-guide-note">Built-in contextual help · No outside AI service or data sharing</p>';
+  document.body.append(button,panel);
+  const log=panel.querySelector('#pb-guide-messages');
+  const prompts=panel.querySelector('#pb-guide-prompts');
+  const context=panel.querySelector('#pb-guide-context');
+  const input=panel.querySelector('#pb-guide-input');
+  const closeBtn=panel.querySelector('#pb-guide-close');
+  const addMessage=(who,text)=>{
+    const el=document.createElement('p');
+    el.className='pb-guide-message '+(who==='assistant'?'pb-guide-answer':'pb-guide-question');
+    el.textContent=text;
+    log.append(el);
+    messages++;
+    while(messages>14){log.firstElementChild?.remove();messages--;}
+    log.scrollTop=log.scrollHeight;
+  };
+  function updatePrompts(){
+    prompts.replaceChildren();
+    pageSpec().prompts.forEach(q=>{
+      const btn=document.createElement('button');btn.type='button';btn.textContent=q;
+      btn.addEventListener('click',()=>ask(q));
+      prompts.append(btn);
+    });
+  }
+  function updateContext(){
+    context.textContent='On this page: '+(LABELS[local.page] || 'Overview')+' · '+(local.actor?.label || 'Current persona');
+    updatePrompts();
+  }
+  function ask(q){
+    addMessage('visitor',q);
+    addMessage('assistant',answer(q));
+  }
+  function toggle(open){
+    opened=!!open;
+    panel.hidden=!opened;
+    button.setAttribute('aria-expanded',String(opened));
+    button.textContent=opened?'×  Close guide':'?  Ask this page';
+    if(opened){
+      if(!messages)addMessage('assistant',introText()+' Choose a suggested question or type your own.');
+      updateContext();input.focus();
+    }else button.focus();
+  }
+  button.addEventListener('click',()=>toggle(!opened));
+  closeBtn.addEventListener('click',()=>toggle(false));
+  panel.querySelector('#pb-guide-form').addEventListener('submit',e=>{
+    e.preventDefault();const q=input.value.trim();if(!q)return;
+    input.value='';ask(q);input.focus();
+  });
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&opened){e.preventDefault();toggle(false);}});
+  window.PlanBridgeChat={
+    setContext(payload){
+      const previous=local.page;
+      Object.assign(local,payload||{});
+      if(previous!==local.page){
+        log.replaceChildren();messages=0;
+        if(opened)addMessage('assistant','Now viewing '+(LABELS[local.page]||'Overview')+'. '+pageSpec().intro);
+      }
+      updateContext();
+    },
+    answer
+  };
+  updateContext();
+})();:'
+  const topicList = TERMS.map(([term,answer]) => ({term,normalized:normalize(term),answer})).sort((a,b)=>b.normalized.length-a.normalized.length);
+  const local = {page:'overview',actor:{label:'Platform Admin'},batch:null,employer:null,person:null,stats:null};
+  let opened=false;
+  let messages=0;
+
+  function pageSpec(){return PAGES[local.page] || PAGES.overview;}
+  function introText(){return LABELS[local.page]+' · '+(local.actor?.label || 'Current persona')+'. '+pageSpec().intro;}
+  function selectedValue(){
+    if (local.page==='payroll' && local.batch) {
+      const b=local.batch;return 'Selected '+b.id+' is '+b.state+'. Expected '+fmt(b.expected_total)+', remitted '+fmt(b.remitted_total)+', variance '+fmt(Number(b.remitted_total || 0)-Number(b.expected_total || 0))+'.';
+    }
+    if (local.page==='employers' && local.employer) return 'Selected '+local.employer.name+' ('+local.employer.id+') is '+local.employer.status+'.';
+    if (local.page==='participants' && local.person) return 'Selected '+local.person.name+' ('+local.person.id+') has a '+local.person.deferral_pct+'% deferral election.';
+    return '';
+  }
+
+  function matchTerm(q){
+    const n=' '+normalize(q)+' ';
+    for (const entry of topicList) {
+      if (n.includes(' '+entry.normalized+' ')) return entry.answer;
+    }
+    return null;
+  }
+  function answer(question){
+    const raw=String(question||'').trim().slice(0,240);
+    if(!raw) return 'Ask about a field, business rule, workflow action, or technology on this page.';
+    const q=normalize(raw),p=pageSpec();
+    if(/\b(hello|hi|hey)\b/.test(q) && q.length<15) return introText();
+    if(/(difference|compare|versus|vs)/.test(q) && /remit/.test(q) && /(calculat|expect)/.test(q)) return TERMS[1][1]+' '+selectedValue();
+    if(/(why|reason).*(block|fail|error|exception)/.test(q) && local.page==='payroll') {
+      if(local.batch?.state==='exception')return 'This batch is in exception state because its validation found a blocking issue. Inspect the Exception workbench, repair as Operations, then validate again. '+selectedValue();
+      return 'Only batches passing mapping, duplicate, reconciliation, and review controls can post. '+selectedValue();
+    }
+    if(/(current|selected|this|my).*(batch|payroll|employer|plan|participant|status|variance)/.test(q) && selectedValue()) return selectedValue()+' Ask about its status or the next allowed step.';
+    if(/(explain|what|meaning|mean|tell).*(field|parameter|number|dashboard|screen|page|metric|column)/.test(q)) return p.fields;
+    if(/\bpay\s*-?\s*600[1-5]\b/.test(q)) {
+      const id=(q.match(/pay\s*-?\s*600[1-5]/)||[''])[0].replace(/\s/g,'').toUpperCase().replace('PAY','PAY-');
+      const cases={'PAY-6001':'Clean payroll: validate with Payroll Specialist, then post with Operations.','PAY-6002':'Unknown participant and remittance issues: validate to create an exception, then remediate and revalidate.','PAY-6003':'Fictional remittance is $125 short: reconcile under Exceptions, then validate again.','PAY-6004':'Duplicate external payroll run ID: the engine must reject replay after its source run was processed.','PAY-6005':'Timeliness review flag: Operations may record acknowledgment, but this does not determine regulatory compliance.'};
+      return (cases[id]||'Payroll fixture.')+' '+(local.batch?.id===id?selectedValue():'');
+    }
+    if(/(how|why).*(role|permission|tenant|security|identity|access)/.test(q)) return p.proof+' '+TERMS.find(x=>x[0]==='rbac')[1];
+    if(/(technology|tech stack|framework|python|javascript|backend|frontend|api|architecture)/.test(q) && /(what|which|how|stack|used|built)/.test(q)) return p.proof+' '+TERMS.find(x=>x[0]==='technology')[1];
+    if(/(what|why).*(this page|this screen|purpose|business)/.test(q)) return p.intro;
+    if(/(production|real world|real integration|simulat)/.test(q)) return TERMS.find(x=>x[0]==='production')[1]+' '+TERMS.find(x=>x[0]==='guidewire')[1];
+    const term=matchTerm(raw);
+    if(term)return term+(selectedValue() && /(variance|calculated total|remitted amount|status|state)/.test(q)?' '+selectedValue():'');
+    if(/(how|walk|steps|try|demo|next|start|use this|what should i do)/.test(q)) return p.how;
+    const help=window.PlanBridgeHelp?.pageHelp?.[local.page];
+    if(help && /(business intent|technical proof|guidewire parallel|how to demo|integration contract|backend boundary)/.test(q)){
+      const card=help.cards.find(([name])=>q.includes(normalize(name)));
+      if(card)return card[1];
+    }
+    const app=document.getElementById('app');
+    const labels=[...app?.querySelectorAll('.definition dt,.stat-label,.data-table th,.field label')||[]].map(el=>el.textContent.trim().replace(/\s*\?$/, '')).filter(Boolean);
+    const unique=[...new Set(labels)].slice(0,14);
+    const termFromVisible=unique.filter(x=>normalize(q).includes(normalize(x))).sort((a,b)=>b.length-a.length)[0];
+    if(termFromVisible)return '“'+termFromVisible+'” is a field on '+LABELS[local.page]+'. '+p.fields+' For a specific rule, ask “How do I use this page?”';
+    return 'I do not have a verified answer to that wording in this demo guide. On '+LABELS[local.page]+', try: '+p.prompts.slice(0,3).join(' · ')+'.';
+  }
+
+  const button=document.createElement('button');
+  button.type='button';button.id='pb-guide-toggle';button.className='pb-guide-toggle';
+  button.setAttribute('aria-controls','pb-guide-panel');button.setAttribute('aria-expanded','false');
+  button.textContent='?  Ask this page';
+  const panel=document.createElement('section');
+  panel.id='pb-guide-panel';panel.className='pb-guide-panel';panel.hidden=true;
+  panel.setAttribute('role','dialog');panel.setAttribute('aria-label','PlanBridge page guide');
+  panel.innerHTML='<header class="pb-guide-header"><div><strong>PlanBridge Page Guide</strong><span>Clear answers from this application</span></div><button type="button" id="pb-guide-close" aria-label="Close page guide">×</button></header>'+
+    '<div class="pb-guide-context" id="pb-guide-context"></div>'+
+    '<div class="pb-guide-messages" id="pb-guide-messages" role="log" aria-label="Guide conversation" aria-live="polite"></div>'+
+    '<div class="pb-guide-prompts" id="pb-guide-prompts" aria-label="Suggested questions"></div>'+
+    '<form id="pb-guide-form" class="pb-guide-form"><label class="pb-guide-sr" for="pb-guide-input">Ask about this page</label><input id="pb-guide-input" type="text" maxlength="240" autocomplete="off" placeholder="Ask about a field or next step…" required><button type="submit">Ask</button></form>'+
+    '<p class="pb-guide-note">Built-in contextual help · No outside AI service or data sharing</p>';
+  document.body.append(button,panel);
+  const log=panel.querySelector('#pb-guide-messages');
+  const prompts=panel.querySelector('#pb-guide-prompts');
+  const context=panel.querySelector('#pb-guide-context');
+  const input=panel.querySelector('#pb-guide-input');
+  const closeBtn=panel.querySelector('#pb-guide-close');
+  const addMessage=(who,text)=>{
+    const el=document.createElement('p');
+    el.className='pb-guide-message '+(who==='assistant'?'pb-guide-answer':'pb-guide-question');
+    el.textContent=text;
+    log.append(el);
+    messages++;
+    while(messages>14){log.firstElementChild?.remove();messages--;}
+    log.scrollTop=log.scrollHeight;
+  };
+  function updatePrompts(){
+    prompts.replaceChildren();
+    pageSpec().prompts.forEach(q=>{
+      const btn=document.createElement('button');btn.type='button';btn.textContent=q;
+      btn.addEventListener('click',()=>ask(q));
+      prompts.append(btn);
+    });
+  }
+  function updateContext(){
+    context.textContent='On this page: '+(LABELS[local.page] || 'Overview')+' · '+(local.actor?.label || 'Current persona');
+    updatePrompts();
+  }
+  function ask(q){
+    addMessage('visitor',q);
+    addMessage('assistant',answer(q));
+  }
+  function toggle(open){
+    opened=!!open;
+    panel.hidden=!opened;
+    button.setAttribute('aria-expanded',String(opened));
+    button.textContent=opened?'×  Close guide':'?  Ask this page';
+    if(opened){
+      if(!messages)addMessage('assistant',introText()+' Choose a suggested question or type your own.');
+      updateContext();input.focus();
+    }else button.focus();
+  }
+  button.addEventListener('click',()=>toggle(!opened));
+  closeBtn.addEventListener('click',()=>toggle(false));
+  panel.querySelector('#pb-guide-form').addEventListener('submit',e=>{
+    e.preventDefault();const q=input.value.trim();if(!q)return;
+    input.value='';ask(q);input.focus();
+  });
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&opened){e.preventDefault();toggle(false);}});
+  window.PlanBridgeChat={
+    setContext(payload){
+      const previous=local.page;
+      Object.assign(local,payload||{});
+      if(previous!==local.page){
+        log.replaceChildren();messages=0;
+        if(opened)addMessage('assistant','Now viewing '+(LABELS[local.page]||'Overview')+'. '+pageSpec().intro);
+      }
+      updateContext();
+    },
+    answer
+  };
+  updateContext();
+})();)+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); };
   const topicList = TERMS.map(([term,answer]) => ({term,normalized:normalize(term),answer})).sort((a,b)=>b.normalized.length-a.normalized.length);
   const local = {page:'overview',actor:{label:'Platform Admin'},batch:null,employer:null,person:null,stats:null};
   let opened=false;
