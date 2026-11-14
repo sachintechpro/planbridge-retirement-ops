@@ -10,6 +10,24 @@
 
 ![PlanBridge home screen](docs/overview-desktop.png)
 
+## Design and contextual help (v2)
+
+PlanBridge uses a distinctive **plum / warm-cream / terracotta** visual system with larger body text, high-contrast controls, responsive cards, horizontal scrolling confined to wide data tables, and a mobile navigation drawer. The interface supports desktop, tablet and phone exploration without a separate mobile application.
+
+Every page has an interactive **Business and technical guide** with three expandable topics:
+
+- **Try the workflow:** business intent and a reproducible action to perform with synthetic records.
+- **Technical detail:** Python API endpoint, role/state gate, reconciliation or audit evidence supporting the screen.
+- **Guidewire concept:** an explicitly labeled architecture/process **analogy**, not a claimed connection.
+
+Tables include touch- and keyboard-accessible **?** tooltips for state, batch, participant, employer, amount and related terms. Escape dismisses help and closes mobile navigation.
+
+**InsuranceSuite boundary:** This is a fictional retirement operations platform. It does **not** use the Guidewire PolicyCenter, BillingCenter or ClaimCenter APIs. References illustrate patterns such as authorization, transaction lifecycles, integration contracts, reconciliations and exception queues. See [Guidewire Cloud API documentation](https://docs.guidewire.com/cloud/bc/202511/cloudapibf/cloudAPI/topics/101-Fund/01-overview-of-Cloud-API/c_introduction-to-Cloud-API.html) for the actual insurance API architecture.
+
+### Responsive verification
+
+The interface was assessed with automated browser viewport/page checks at widths **320, 390, 768, 1024 and 1440 pixels** covering all nine pages. Server business logic and 21 Python tests remain unchanged by this user-interface enhancement. The interactive 18-check test bench remains available on the Test bench page.
+
 ## Start here: 7-minute guided demo
 
 This project is meant to be **tested**, not just read. A hiring manager can explore each persona, process a realistic payroll batch, diagnose errors, examine the simulated money trail, and run the automated QA evidence without requesting credentials.
