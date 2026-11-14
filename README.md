@@ -1,5 +1,9 @@
 # PlanBridge — Retirement Operations Studio
 
+**Live application:** https://planbridge-retirement-ops.onrender.com/  
+**Portfolio:** https://sachintechpro.github.io/#projects  
+**Source:** https://github.com/sachintechpro/planbridge-retirement-ops
+
 **A working forward-deployed engineering case study**: fictional U.S. 401(k)/403(b) retirement operations, modeled on industry workflows rather than on any particular provider's proprietary product. Independent portfolio project; **not affiliated with Human Interest** or any other provider.
 
 > **Purpose:** Demonstrate how an FDE can discover operational friction, build a role-aware application, integrate payroll-style feeds, encode business workflow gates, diagnose exceptions, create auditable state changes, and verify the solution with runnable tests. The software uses synthetic data. It never moves money, opens real financial accounts, or provides investment, fiduciary, or legal advice.
