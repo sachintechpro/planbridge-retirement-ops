@@ -181,12 +181,18 @@
     }
     if(/(current|selected|this|my).*(batch|payroll|employer|plan|participant|status|variance)/.test(q) && selectedValue()) return selectedValue()+' Ask about its status or the next allowed step.';
     if(/(explain|what|meaning|mean|tell).*(field|parameter|number|dashboard|screen|page|metric|column)/.test(q)) return p.fields;
+    if(/\bpay\s*-?\s*600[1-5]\b/.test(q)) {
+      const id=(q.match(/pay\s*-?\s*600[1-5]/)||[''])[0].replace(/\s/g,'').toUpperCase().replace('PAY','PAY-');
+      const cases={'PAY-6001':'Clean payroll: validate with Payroll Specialist, then post with Operations.','PAY-6002':'Unknown participant and remittance issues: validate to create an exception, then remediate and revalidate.','PAY-6003':'Fictional remittance is $125 short: reconcile under Exceptions, then validate again.','PAY-6004':'Duplicate external payroll run ID: the engine must reject replay after its source run was processed.','PAY-6005':'Timeliness review flag: Operations may record acknowledgment, but this does not determine regulatory compliance.'};
+      return (cases[id]||'Payroll fixture.')+' '+(local.batch?.id===id?selectedValue():'');
+    }
+    if(/(how|why).*(role|permission|tenant|security|identity|access)/.test(q)) return p.proof+' '+TERMS.find(x=>x[0]==='rbac')[1];
     if(/(technology|tech stack|framework|python|javascript|backend|frontend|api|architecture)/.test(q) && /(what|which|how|stack|used|built)/.test(q)) return p.proof+' '+TERMS.find(x=>x[0]==='technology')[1];
-    if(/(how|walk|steps|try|demo|next|start|use this|what should i do)/.test(q)) return p.how;
     if(/(what|why).*(this page|this screen|purpose|business)/.test(q)) return p.intro;
     if(/(production|real world|real integration|simulat)/.test(q)) return TERMS.find(x=>x[0]==='production')[1]+' '+TERMS.find(x=>x[0]==='guidewire')[1];
     const term=matchTerm(raw);
     if(term)return term+(selectedValue() && /(variance|calculated total|remitted amount|status|state)/.test(q)?' '+selectedValue():'');
+    if(/(how|walk|steps|try|demo|next|start|use this|what should i do)/.test(q)) return p.how;
     const help=window.PlanBridgeHelp?.pageHelp?.[local.page];
     if(help && /(business intent|technical proof|guidewire parallel|how to demo|integration contract|backend boundary)/.test(q)){
       const card=help.cards.find(([name])=>q.includes(normalize(name)));
