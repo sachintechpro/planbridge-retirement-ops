@@ -58,7 +58,7 @@ class Handler(BaseHTTPRequestHandler):
                 data=s['engine'].snapshot()
             return self.reply(200,{'data':data,'csrf':s['csrf']},sid)
         if path=='/' or path=='/index.html':path='/index.html'
-        if path in ('/index.html','/app.js','/styles.css','/theme.css','/help.js'):
+        if path in ('/index.html','/app.js','/styles.css','/theme.css','/help.js','/chat.js','/chat.css'):
             resource=STATIC/path.lstrip('/')
             kind={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'application/javascript; charset=utf-8'}[resource.suffix]
             return self.send_bytes(200,resource.read_bytes(),kind)

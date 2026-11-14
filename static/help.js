@@ -143,5 +143,5 @@
     }
   });
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeMenu();document.querySelectorAll('.context-topic[open],.help-inline[open]').forEach(d=>d.open=false);}});
-  window.PlanBridgeHelp={render,closeMenu,toggleMenu};
+  window.PlanBridgeHelp={render,closeMenu,toggleMenu,pageHelp,tableHelp};
 })();

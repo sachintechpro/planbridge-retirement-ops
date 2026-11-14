@@ -11,6 +11,12 @@
 ![PlanBridge home screen](docs/overview-desktop.png)
 
 
+## Interactive, page-aware chat guide
+
+Use **Ask this page** (lower-right corner) to ask quick questions about the active screen, its fields and data, a workflow step, validation and permissions, or the Python/API architecture. The guide changes suggestions when a visitor navigates to another page or switches persona, and explains the currently selected payroll, employer, or participant record. Visitors can ask free-text questions or use suggested prompts. It also supplies examples for negative paths (PAY-6002/6003/6004/6005) and test evidence.
+
+The guide is **self-contained and read-only**: it uses verified explanations from this application's code and help content; it does not call an external AI provider, move funds, change the scenario, or send questions anywhere. Unsupported questions are identified as such rather than answered speculatively.
+
 **Mobile UI release:** v2.1 · normalized typography, iPhone-safe layouts, and contextual help.
 
 ## Readable mobile interface and contextual guidance
