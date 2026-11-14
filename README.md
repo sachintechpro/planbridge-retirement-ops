@@ -7,6 +7,8 @@
 ![PlanBridge home screen](docs/overview-desktop.png)
 
 
+**Mobile UI release:** v2.1 · normalized typography, iPhone-safe layouts, and contextual help.
+
 ## Readable mobile interface and contextual guidance
 
 The current interface uses a **consistent responsive typography scale** across all nine pages, including a compact 15px technical-note style. On small screens the navigation becomes a drawer, long tables scroll *inside* their cards, and field tooltips open inside the viewport. The design is checked at **320, 375, 393, 768, and 1440 CSS pixels**. The theme uses warm cream, plum, and terracotta rather than a standard blue/white template.
