@@ -8,7 +8,9 @@
 **Source repository:** [sachintechpro/planbridge-retirement-ops](https://github.com/sachintechpro/planbridge-retirement-ops)  
 **Demo access:** No account, credentials, payments, or external API keys required.
 
-![PlanBridge home screen](docs/overview-desktop.png)
+**[Launch the live interactive PlanBridge application](https://planbridge-retirement-ops.onrender.com/)** · [Browse source code](https://github.com/sachintechpro/planbridge-retirement-ops)
+
+*The live application reflects the latest responsive editorial redesign. Earlier reference screenshots in `docs/` are retained as historical design artifacts.*
 
 ## Design and contextual help (v2)
 
