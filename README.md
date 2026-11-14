@@ -26,7 +26,7 @@ Tables include touch- and keyboard-accessible **?** tooltips for state, batch, p
 
 ### Responsive verification
 
-The interface was assessed with automated browser viewport/page checks at widths **320, 390, 768, 1024 and 1440 pixels** covering all nine pages. Server business logic and 21 Python tests remain unchanged by this user-interface enhancement. The interactive 18-check test bench remains available on the Test bench page.
+The interface was assessed with automated browser viewport/page checks at widths **320, 390, 768, 1024 and 1440 pixels** covering all nine pages. Server business logic and 21 Python engine tests remain unchanged by this user-interface enhancement; six new UI contract tests verify responsiveness, help affordances, navigation and Guidewire boundaries. The interactive 18-check test bench remains available on the Test bench page.
 
 ## Start here: 7-minute guided demo
 
@@ -66,7 +66,7 @@ Run tests:
 python -m unittest discover -s tests -v
 ```
 
-The **Test bench** tab also runs 18 isolated business/technical checks and exposes the evidence for each. The repository includes 21 standalone Python unit/workflow tests.
+The **Test bench** tab also runs 18 isolated business/technical checks and exposes the evidence for each. The repository includes 21 Python engine/workflow tests and six additional responsive UI/context-help contract tests (27 total).
 
 ## Business workflow
 
@@ -125,7 +125,7 @@ All names and amounts are invented. The sample `example.test` addresses are non-
 - **Backend:** Python standard-library `ThreadingHTTPServer`; no paid APIs, frameworks or environment variables required.
 - **State:** each browser has an independent ephemeral, in-memory session with an HttpOnly, SameSite cookie. A reset restores seeded data. A server restart clears session state. Not a persistence architecture for production.
 - **Controls:** CSRF token on mutations, JSON body size cap, server-side role/tenant checks, action-specific workflow guards, amount reconciliation, no double-posting, audit events, and basic security headers.
-- **QA:** 18 interactive deterministic checks in `quality.py` and 21 automated Python tests in `tests/test_engine.py`; GitHub Actions CI workflow.
+- **QA:** 18 interactive deterministic checks in `quality.py` and 21 engine/workflow tests in `tests/test_engine.py`, plus six UI contract tests in `tests/test_ui_contract.py`; GitHub Actions CI workflow.
 - **Hosting:** free Render web service supported by `render.yaml`; no billing/AI/search subscriptions needed.
 
 ### API contract
@@ -166,7 +166,7 @@ The IRS explains elective deferrals, employer matches, and participant limits; t
 - **Real functional state transitions:** validation and exception repairs change the Python engine's in-memory state in the server-backed version. Refresh the browser to see the resulting session state.
 - **Negative-path testing:** duplicate payroll runs, tenant boundary violations, invalid contributions, missing participants, unapplied approvals and repeat posting are rejected by server logic, not just hidden UI buttons.
 - **Business/engineering traceability:** every guided scenario maps a business operation to the related actor, API action, expected status, and evidence.
-- **Reviewability:** `tests/test_engine.py` covers 21 workflow and permission scenarios; `quality.py` powers 18 named on-demand checks. `reports/qa-report.json` is a baseline artifact, not a substitute for running the tests.
+- **Reviewability:** `tests/test_engine.py` covers 21 workflow and permission scenarios; `tests/test_ui_contract.py` adds six interface/accessibility contracts; `quality.py` powers 18 named on-demand checks. `reports/qa-report.json` is a baseline artifact, not a substitute for running the tests.
 - **Data realism with safety:** all five employers, 60 participants and seven payroll batches are synthetic and deterministic. There are no external financial integrations.
 
 **FDE boundary:** This is a realistic *portfolio implementation*, not a claim of having deployed a retirement platform to a real customer. The README separately identifies proposed production integrations and what is implemented today.
