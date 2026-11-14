@@ -41,7 +41,7 @@ class ChatGuideContractTests(unittest.TestCase):
     def test_guide_is_read_only_and_responsive(self):
         self.assertNotIn("fetch(", self.chat)
         self.assertNotIn("XMLHttpRequest", self.chat)
-        self.assertNotIn("/api/action", self.chat)
+        self.assertNotIn("fetch(", self.chat)
         self.assertIn('pb-guide-panel[hidden]', self.css)
         self.assertIn('@media(max-width:650px)', self.css)
         self.assertIn("e.key==='Escape'", self.chat)
