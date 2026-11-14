@@ -4,6 +4,10 @@
 
 > **Purpose:** Demonstrate how an FDE can discover operational friction, build a role-aware application, integrate payroll-style feeds, encode business workflow gates, diagnose exceptions, create auditable state changes, and verify the solution with runnable tests. The software uses synthetic data. It never moves money, opens real financial accounts, or provides investment, fiduciary, or legal advice.
 
+**Live interactive demo:** [Launch PlanBridge on Render](https://planbridge-retirement-ops.onrender.com/)  
+**Source repository:** [sachintechpro/planbridge-retirement-ops](https://github.com/sachintechpro/planbridge-retirement-ops)  
+**Demo access:** No account, credentials, payments, or external API keys required.
+
 ![PlanBridge home screen](docs/overview-desktop.png)
 
 ## Start here: 7-minute guided demo
@@ -149,12 +153,12 @@ The IRS explains elective deferrals, employer matches, and participant limits; t
 
 **FDE boundary:** This is a realistic *portfolio implementation*, not a claim of having deployed a retirement platform to a real customer. The README separately identifies proposed production integrations and what is implemented today.
 
-## Render deployment
+## Live demo and deployment
 
-1. Create a **new public GitHub repository** named `planbridge-retirement-ops`.
-2. Commit these files to its `main` branch (leave all files in the project root).
-3. On Render, choose **New → Blueprint** and connect the repository, or **New → Web Service** with runtime Python, build command `python -m unittest discover -s tests -q`, start command `python server.py`, and free instance plan.
-4. Once deployed, verify `/health`, all personas, payroll happy/exception paths, audit evidence, test bench, and a mobile viewport.
-5. Add the verified Render URL and repository URL at the top of this README and to your portfolio once both exist.
+- **[Open the public PlanBridge demo](https://planbridge-retirement-ops.onrender.com/)** — switch between personas, complete simulated employer and payroll workflows, inspect audit evidence, and run the interactive test bench.
+- **[View the GitHub source](https://github.com/sachintechpro/planbridge-retirement-ops)** — inspect the Python engine, frontend, CSV fixtures, QA tests and implementation documentation.
+- **[Check service health](https://planbridge-retirement-ops.onrender.com/health)** — expected JSON includes `"status":"healthy"`.
+- **Automatic deployment:** Render deploys commits to `main`. Build command: `python -m compileall -q . && python -m unittest discover -s tests -q`; start command: `python server.py`.
+- **Cold starts:** Free-tier instances may take additional time to respond after inactivity. Session data is intentionally ephemeral and resets when the server restarts.
 
 No API keys. No secrets. No real user/customer data. No external vendors. 
