@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: planbridge-retirement-ops
+    runtime: python
+    plan: free
+    buildCommand: python -m compileall -q . && python -m unittest discover -s tests -q
+    startCommand: python server.py
+    autoDeployTrigger: commit
+    healthCheckPath: /health

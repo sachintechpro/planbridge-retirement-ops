@@ -1,0 +1,8 @@
+id,external_id,employer_id,pay_date,state,remitted_total,flag,scenario
+PAY-6001,NSTAR-20261113-A,EMP-101,2026-11-13,received,606.88,,Happy path: valid pay run
+PAY-6002,NSTAR-20261113-B,EMP-101,2026-11-13,received,532.41,,Unknown employee identifier
+PAY-6003,FORGE-20261113-A,EMP-102,2026-11-13,received,709.23,,Remittance does not reconcile
+PAY-6004,NSTAR-20261113-A,EMP-101,2026-11-13,received,606.88,,Duplicate payroll file
+PAY-6005,ATLAS-20260918,EMP-105,2026-09-18,received,1515.36,timeliness_review,Potential late contribution: review required
+PAY-6006,FORGE-20261106,EMP-102,2026-11-06,posted,834.23,,Previously posted source for duplicate control
+PAY-6007,ATLAS-20261113,EMP-105,2026-11-13,received,1515.36,,Second valid pay run

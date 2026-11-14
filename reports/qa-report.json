@@ -1,0 +1,118 @@
+{
+  "total": 18,
+  "passed": 18,
+  "failed": 0,
+  "results": [
+    {
+      "category": "Unit",
+      "name": "Employer match formula",
+      "status": "PASS",
+      "evidence": "5% employee + 50% match up to 4% on $2,000 = $100 + $40"
+    },
+    {
+      "category": "Unit",
+      "name": "Zero deferral produces no contribution",
+      "status": "PASS",
+      "evidence": "Employee $0, Employer $0"
+    },
+    {
+      "category": "Unit",
+      "name": "Deferral rounding",
+      "status": "PASS",
+      "evidence": "Currency rounded to cents"
+    },
+    {
+      "category": "Integration",
+      "name": "Seeded master-data joins",
+      "status": "PASS",
+      "evidence": "60 participant foreign keys resolve"
+    },
+    {
+      "category": "Integration",
+      "name": "Payroll amount reconciles",
+      "status": "PASS",
+      "evidence": "PAY-6001: no validation exceptions"
+    },
+    {
+      "category": "Integration",
+      "name": "Unknown participant identified",
+      "status": "PASS",
+      "evidence": "PAY-6002: unmatched participant"
+    },
+    {
+      "category": "Integration",
+      "name": "Remittance mismatch identified",
+      "status": "PASS",
+      "evidence": "PAY-6003: short by $125"
+    },
+    {
+      "category": "Integration",
+      "name": "Timeliness review flagged",
+      "status": "PASS",
+      "evidence": "PAY-6005: human review rather than auto-judgment"
+    },
+    {
+      "category": "E2E",
+      "name": "Payroll \u2192 validate \u2192 post \u2192 ledger",
+      "status": "PASS",
+      "evidence": "8 balanced employee/employer entries and batch posted"
+    },
+    {
+      "category": "E2E",
+      "name": "Posting replay protection",
+      "status": "PASS",
+      "evidence": "Second posting rejected; no double credit"
+    },
+    {
+      "category": "E2E",
+      "name": "Exception \u2192 repair \u2192 revalidate",
+      "status": "PASS",
+      "evidence": "Short-remittance case remediated with review history"
+    },
+    {
+      "category": "RBAC",
+      "name": "Employer cannot post funds",
+      "status": "PASS",
+      "evidence": "HTTP 403 enforced on backend"
+    },
+    {
+      "category": "RBAC",
+      "name": "Cross-employer action forbidden",
+      "status": "PASS",
+      "evidence": "Cedar Arc cannot modify Blue Mesa"
+    },
+    {
+      "category": "RBAC",
+      "name": "Participant cannot edit peer election",
+      "status": "PASS",
+      "evidence": "HTTP 403 for another employee"
+    },
+    {
+      "category": "Security",
+      "name": "Out-of-range election rejected",
+      "status": "PASS",
+      "evidence": "Percent > 50 rejected"
+    },
+    {
+      "category": "UAT",
+      "name": "Distribution is review-only",
+      "status": "PASS",
+      "evidence": "Request does not debit balance or send money"
+    },
+    {
+      "category": "UAT",
+      "name": "Plan activation state machine",
+      "status": "PASS",
+      "evidence": "draft \u2192 configured \u2192 live"
+    },
+    {
+      "category": "RBAC",
+      "name": "Participant scoped read model",
+      "status": "PASS",
+      "evidence": "Only own profile; no employer payroll feed"
+    }
+  ],
+  "execution": "isolated deterministic state; active visitor data unchanged",
+  "source": "quality.py",
+  "executed_at": "2026-11-14 (fixture validation)"
+}

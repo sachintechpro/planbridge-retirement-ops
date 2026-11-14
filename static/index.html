@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f7f9fc">
+<meta name="description" content="PlanBridge: interactive retirement plan operations simulation with payroll validation, participant elections, exception handling, fictional ledger, and automated QA.">
+<title>PlanBridge | Retirement Operations Studio</title>
+<link rel="stylesheet" href="/styles.css">
+</head><body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span><div><strong>PlanBridge</strong><small>RETIREMENT OPERATIONS</small></div></div>
+    <div class="nav-label">WORKSPACE</div>
+    <nav id="nav" aria-label="Main navigation"></nav>
+    <div class="sidebar-bottom">
+      <div class="mini-title"><span class="pulse"></span> Interactive operations simulator</div>
+      <p>Fictional U.S. employers, synthetic participants, and simulated contribution records.</p>
+      <button type="button" class="subtle-action" id="reset-btn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg> Reset my workspace</button>
+    </div>
+  </aside>
+  <div class="main-wrap">
+    <header class="topbar">
+      <button type="button" class="mobile-menu" id="menu-toggle" aria-label="Open navigation">☰</button>
+      <div class="top-meta"><span class="top-crumb">PlanBridge</span><span class="crumb-slash">/</span><span id="crumb-current">Overview</span></div>
+      <div class="top-controls"><span class="environment"><span class="pulse"></span> Interactive sandbox</span><div class="persona"><label for="actor-select">Viewing as</label><select id="actor-select" aria-label="Choose a demonstration persona"></select></div></div>
+    </header>
+    <main id="app" tabindex="-1"><div class="loading"><span class="loader"></span><p>Loading fictional operations data…</p></div></main>
+    <footer class="footer">PlanBridge · Independent fictional portfolio project · No real accounts, financial transactions, or investment advice.</footer>
+  </div>
+</div>
+<div role="status" aria-live="polite" id="toast" class="toast" hidden></div>
+<script src="/app.js" defer></script>
+</body></html>

@@ -1,0 +1,6 @@
+id,name,industry,location,status,plan_type,payroll_partner,participants,match,owner,onboarding,next_payroll
+EMP-101,Cedar Arc Design Co.,Architecture & Design,"Austin, TX",live,401(k),Northstar Payroll,12,50% of first 4%,Alicia Grant,Complete,2026-11-20
+EMP-102,Summitfield Manufacturing,Light Manufacturing,"Columbus, OH",live,401(k),ForgePay,12,50% of first 4%,Daniel Brooks,Complete,2026-11-20
+EMP-103,Harborline Clinics,Outpatient Healthcare,"Sacramento, CA",configured,403(b),CarePay Connect,12,50% of first 4%,Priya Raman,Verification,2026-11-27
+EMP-104,Blue Mesa Kitchens,Construction Services,"Phoenix, AZ",draft,401(k),Northstar Payroll,12,50% of first 4%,Ethan Cole,Plan configuration,2026-12-04
+EMP-105,Redwood Learning Group,Professional Education,"Seattle, WA",live,401(k),AtlasPay,12,50% of first 4%,Nora Patel,Complete,2026-11-20
